@@ -10,8 +10,7 @@ TOOLCHAIN = $(TOP)/xtensa-lx106-elf
 
 # Vendor SDK version to install, see VENDOR_SDK_ZIP_* vars below
 # for supported versions.
-VENDOR_SDK = 2.2.x-9e14b9c0
-#VENDOR_SDK = 2.2.0-master
+VENDOR_SDK = 3.0.0-71df728
 
 .PHONY: crosstool-NG toolchain libhal libcirom sdk
 
@@ -24,7 +23,7 @@ UNZIP = unzip -q -o
 VENDOR_SDK_ZIP = $(VENDOR_SDK_ZIP_$(VENDOR_SDK))
 VENDOR_SDK_DIR = $(VENDOR_SDK_DIR_$(VENDOR_SDK))
 
-VENDOR_SDK_DIR_2.2.0-master = ESP8266_NONOS_SDK-2.2.0-master
+VENDOR_SDK_DIR_3.0.0-71df728 = ESP8266_NONOS_SDK-3.0.0-71df728
 VENDOR_SDK_DIR_2.2.x-9e14b9c0 = ESP8266_NONOS_SDK-2.2.x-9e14b9c0
 VENDOR_SDK_ZIP_2.1.0 = ESP8266_NONOS_SDK-2.1.0.zip
 VENDOR_SDK_DIR_2.1.0 = ESP8266_NONOS_SDK-2.1.0
@@ -182,10 +181,10 @@ $(VENDOR_SDK_DIR)/.dir: $(VENDOR_SDK_ZIP)
 	-mv License $(VENDOR_SDK_DIR)
 	touch $@
 
-$(VENDOR_SDK_DIR_2.2.0-master)/.dir:
-	echo $(VENDOR_SDK_DIR_2.2.0-master)
-	git clone https://github.com/espressif/ESP8266_NONOS_SDK $(VENDOR_SDK_DIR_2.2.0-master)
-	(cd $(VENDOR_SDK_DIR_2.2.0-master); git checkout master)
+$(VENDOR_SDK_DIR_3.0.0-71df728)/.dir:
+	echo $(VENDOR_SDK_DIR_3.0.0-71df728)
+	git clone https://github.com/espressif/ESP8266_NONOS_SDK $(VENDOR_SDK_DIR_3.0.0-71df728)
+	(cd $(VENDOR_SDK_DIR_3.0.0-master); git checkout 71df728)
 	touch $@
 
 $(VENDOR_SDK_DIR_2.2.x-9e14b9c0)/.dir:
@@ -212,8 +211,8 @@ $(VENDOR_SDK_DIR_1.5.4)/.dir: $(VENDOR_SDK_ZIP_1.5.4)
 
 sdk_patch: $(VENDOR_SDK_DIR)/.dir .sdk_patch_$(VENDOR_SDK)
 
-.sdk_patch_2.2.0-master .sdk_patch_2.2.0: user_rf_cal_sector_set.o
-	echo -e "#undef ESP_SDK_VERSION\n#define ESP_SDK_VERSION 020200" >>$(VENDOR_SDK_DIR)/include/esp_sdk_ver.h
+.sdk_patch_3.0.0-71df728: user_rf_cal_sector_set.o
+	echo -e "#undef ESP_SDK_VERSION\n#define ESP_SDK_VERSION 030300" >>$(VENDOR_SDK_DIR)/include/esp_sdk_ver.h
 	$(PATCH) -d $(VENDOR_SDK_DIR) -p1 < c_types-c99_sdk_2.patch
 	cd $(VENDOR_SDK_DIR)/lib; mkdir -p tmp; cd tmp; $(TOOLCHAIN)/bin/xtensa-lx106-elf-ar x ../libcrypto.a; cd ..; $(TOOLCHAIN)/bin/xtensa-lx106-elf-ar rs libwpa.a tmp/*.o
 	$(TOOLCHAIN)/bin/xtensa-lx106-elf-ar r $(VENDOR_SDK_DIR)/lib/libmain.a user_rf_cal_sector_set.o
