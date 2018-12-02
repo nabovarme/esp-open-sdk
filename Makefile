@@ -10,7 +10,7 @@ TOOLCHAIN = $(TOP)/xtensa-lx106-elf
 
 # Vendor SDK version to install, see VENDOR_SDK_ZIP_* vars below
 # for supported versions.
-VENDOR_SDK = 3.0.0-71df728
+VENDOR_SDK = git-master
 
 .PHONY: crosstool-NG toolchain libhal libcirom sdk
 
@@ -23,6 +23,7 @@ UNZIP = unzip -q -o
 VENDOR_SDK_ZIP = $(VENDOR_SDK_ZIP_$(VENDOR_SDK))
 VENDOR_SDK_DIR = $(VENDOR_SDK_DIR_$(VENDOR_SDK))
 
+VENDOR_SDK_DIR_git-master = ESP8266_NONOS_SDK-git-master
 VENDOR_SDK_DIR_3.0.0-71df728 = ESP8266_NONOS_SDK-3.0.0-71df728
 VENDOR_SDK_DIR_2.2.x-9e14b9c0 = ESP8266_NONOS_SDK-2.2.x-9e14b9c0
 VENDOR_SDK_ZIP_2.1.0 = ESP8266_NONOS_SDK-2.1.0.zip
@@ -181,6 +182,12 @@ $(VENDOR_SDK_DIR)/.dir: $(VENDOR_SDK_ZIP)
 	-mv License $(VENDOR_SDK_DIR)
 	touch $@
 
+$(VENDOR_SDK_DIR_git-master)/.dir:
+	echo $(VENDOR_SDK_DIR_git-master)
+	git clone https://github.com/espressif/ESP8266_NONOS_SDK $(VENDOR_SDK_DIR_git-master)
+	(cd $(VENDOR_SDK_DIR_git-master); git checkout master)
+	touch $@
+
 $(VENDOR_SDK_DIR_3.0.0-71df728)/.dir:
 	echo $(VENDOR_SDK_DIR_3.0.0-71df728)
 	git clone https://github.com/espressif/ESP8266_NONOS_SDK $(VENDOR_SDK_DIR_3.0.0-71df728)
@@ -210,6 +217,13 @@ $(VENDOR_SDK_DIR_1.5.4)/.dir: $(VENDOR_SDK_ZIP_1.5.4)
 	touch $@
 
 sdk_patch: $(VENDOR_SDK_DIR)/.dir .sdk_patch_$(VENDOR_SDK)
+
+.sdk_patch_git-master: user_rf_cal_sector_set.o
+	echo -e "#undef ESP_SDK_VERSION\n#define ESP_SDK_VERSION 030300" >>$(VENDOR_SDK_DIR)/include/esp_sdk_ver.h
+	$(PATCH) -d $(VENDOR_SDK_DIR) -p1 < c_types-c99_sdk_2.patch
+	cd $(VENDOR_SDK_DIR)/lib; mkdir -p tmp; cd tmp; $(TOOLCHAIN)/bin/xtensa-lx106-elf-ar x ../libcrypto.a; cd ..; $(TOOLCHAIN)/bin/xtensa-lx106-elf-ar rs libwpa.a tmp/*.o
+	$(TOOLCHAIN)/bin/xtensa-lx106-elf-ar r $(VENDOR_SDK_DIR)/lib/libmain.a user_rf_cal_sector_set.o
+	@touch $@
 
 .sdk_patch_3.0.0-71df728: user_rf_cal_sector_set.o
 	echo -e "#undef ESP_SDK_VERSION\n#define ESP_SDK_VERSION 030300" >>$(VENDOR_SDK_DIR)/include/esp_sdk_ver.h
