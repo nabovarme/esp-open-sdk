@@ -10,8 +10,8 @@ TOOLCHAIN = $(TOP)/xtensa-lx106-elf
 
 # Vendor SDK version to install, see VENDOR_SDK_ZIP_* vars below
 # for supported versions.
-VENDOR_SDK = 2.2.x-778b145
-#VENDOR_SDK = 2.2.0-master
+#VENDOR_SDK = 2.2.x-778b145
+VENDOR_SDK = 2.2.0-master
 
 .PHONY: crosstool-NG toolchain libhal libcirom sdk
 
