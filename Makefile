@@ -185,7 +185,7 @@ $(VENDOR_SDK_DIR)/.dir: $(VENDOR_SDK_ZIP)
 $(VENDOR_SDK_DIR_2.2.0-master)/.dir:
 	echo $(VENDOR_SDK_DIR_2.2.0-master)
 	git clone https://github.com/espressif/ESP8266_NONOS_SDK $(VENDOR_SDK_DIR_2.2.0-master)
-	(cd $(VENDOR_SDK_DIR_2.2.0-master); git checkout master)
+	(cd $(VENDOR_SDK_DIR_2.2.0-master); git checkout release/v2.2.x)
 	touch $@
 
 $(VENDOR_SDK_DIR_2.2.x-778b145)/.dir:
