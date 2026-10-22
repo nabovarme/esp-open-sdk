@@ -11,3 +11,4 @@
 [submodule "crosstool-NG"]
 	path = crosstool-NG
 	url = https://github.com/nabovarme/crosstool-NG.git
+	branch = xtensa-1.22.x
